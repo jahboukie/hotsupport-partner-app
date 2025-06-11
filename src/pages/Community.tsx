@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Heart, Users, TrendingUp, Clock, Award, Share2, ThumbsUp } from 'lucide-react';
+import SubscriptionGate from '../components/SubscriptionGate';
 
 interface CommunityPost {
   id: string;
@@ -135,8 +136,9 @@ const Community: React.FC = () => {
     : communityPosts.filter(post => post.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-4xl mx-auto">
+    <SubscriptionGate feature="community">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
@@ -364,8 +366,9 @@ const Community: React.FC = () => {
             </div>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </SubscriptionGate>
   );
 };
 

@@ -36,6 +36,14 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
       description: 'Your support hub'
     },
     { 
+      name: 'Mama Grace', 
+      href: '/mama-grace', 
+      icon: HeartIcon, 
+      iconSolid: HeartIcon,
+      description: '75 years of wisdom',
+      special: true
+    },
+    { 
       name: 'Communication', 
       href: '/communication', 
       icon: ChatBubbleLeftRightIcon, 
@@ -164,12 +172,12 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
                           isActive
                             ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-500'
                             : 'text-gray-700 hover:bg-gray-100'
-                        } ${item.urgent ? 'ring-2 ring-red-200' : ''}`}
+                        } ${item.urgent ? 'ring-2 ring-red-200' : ''} ${item.special ? 'bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-200' : ''}`}
                       >
                         <Icon 
                           className={`mr-4 flex-shrink-0 h-6 w-6 ${
                             isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
-                          } ${item.urgent ? 'text-red-500' : ''}`}
+                          } ${item.urgent ? 'text-red-500' : ''} ${item.special ? 'text-rose-500' : ''}`}
                         />
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
@@ -233,12 +241,12 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
                       isActive
                         ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-500'
                         : 'text-gray-700 hover:bg-gray-100'
-                    } ${item.urgent ? 'ring-2 ring-red-200' : ''}`}
+                    } ${item.urgent ? 'ring-2 ring-red-200' : ''} ${item.special ? 'bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-200' : ''}`}
                   >
                     <Icon 
                       className={`mr-3 flex-shrink-0 h-6 w-6 ${
                         isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
-                      } ${item.urgent ? 'text-red-500' : ''}`}
+                      } ${item.urgent ? 'text-red-500' : ''} ${item.special ? 'text-rose-500' : ''}`}
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">

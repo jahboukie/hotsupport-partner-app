@@ -6,11 +6,17 @@ export class EcosystemIntegration {
   private apiBaseUrl: string
 
   constructor() {
-    // Initialize Supabase client for ecosystem data
-    this.supabase = createClient(
-      import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co',
-      import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key'
-    )
+    // Initialize Supabase client for ecosystem data (disabled for now)
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    // Only initialize if we have real credentials
+    if (supabaseUrl && supabaseKey && !supabaseUrl.includes('your-project')) {
+      this.supabase = createClient(supabaseUrl, supabaseKey);
+    } else {
+      this.supabase = null; // Disable Supabase for now
+    }
+    
     this.apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
   }
 
@@ -56,6 +62,10 @@ export class EcosystemIntegration {
 
   async getPartnerConnections(userId: string) {
     try {
+      if (!this.supabase) {
+        return { success: true, data: [] }; // Return empty for now
+      }
+      
       const { data, error } = await this.supabase
         .from('partner_connections')
         .select(`
@@ -430,6 +440,122 @@ export class EcosystemIntegration {
       console.error('Error sending push notification:', error)
     }
   }
+
+  // SentimentAsAService Integration
+  async sendToSentimentPlatform(data: SentimentData) {
+    try {
+      const response = await fetch(`${this.apiBaseUrl}/api/data/ingest`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': import.meta.env.VITE_SENTIMENT_API_KEY || 'demo-key'
+        },
+        body: JSON.stringify({
+          appName: 'SupportPartner',
+          userId: data.userId,
+          partnerId: data.partnerId,
+          textContent: data.content,
+          contextMetadata: {
+            actionType: data.actionType,
+            supportCategory: data.category,
+            relationshipPhase: data.relationshipPhase,
+            partnerHealthStatus: data.partnerHealthStatus,
+            communicationSentiment: data.sentiment,
+            effectivenessRating: data.effectiveness
+          },
+          timestamp: new Date().toISOString(),
+          anonymize: true
+        })
+      })
+
+      const result = await response.json()
+      return { success: response.ok, data: result }
+    } catch (error) {
+      console.error('Error sending data to SentimentAsAService:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
+  async trackRelationshipDynamics(userId: string, partnerId: string, interaction: RelationshipInteraction) {
+    try {
+      // Enhanced relationship tracking for correlation analytics
+      const sentimentData: SentimentData = {
+        userId,
+        partnerId,
+        content: interaction.description,
+        actionType: interaction.type,
+        category: interaction.category,
+        relationshipPhase: interaction.relationshipPhase || 'active_support',
+        partnerHealthStatus: interaction.partnerHealthContext,
+        sentiment: interaction.sentimentScore,
+        effectiveness: interaction.effectiveness
+      }
+
+      // Send to SentimentAsAService for correlation analysis
+      const sentimentResult = await this.sendToSentimentPlatform(sentimentData)
+      
+      // Store locally for immediate feedback
+      const localResult = await this.logSupportAction(userId, partnerId, {
+        type: interaction.type,
+        description: interaction.description,
+        effectiveness: interaction.effectiveness,
+        partnerResponse: interaction.partnerResponse,
+        notes: interaction.notes
+      })
+
+      return { 
+        success: sentimentResult.success && localResult.success, 
+        sentimentTracking: sentimentResult,
+        localTracking: localResult
+      }
+    } catch (error) {
+      console.error('Error tracking relationship dynamics:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
+  async getCrossAppCorrelationInsights(userId: string, partnerId: string, timeframe: string = '30d') {
+    try {
+      // Fetch correlation insights from SentimentAsAService
+      const response = await fetch(`${this.apiBaseUrl}/api/enterprise/analytics/correlations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': import.meta.env.VITE_SENTIMENT_API_KEY || 'demo-key'
+        },
+        body: JSON.stringify({
+          userId,
+          partnerId,
+          appCombinations: ['SupportPartner', 'MenoWellness'],
+          timeframe,
+          minCorrelationStrength: 0.3,
+          includeRelationshipMetrics: true,
+          includeClinicalOutcomes: true
+        })
+      })
+
+      const result = await response.json()
+      
+      if (response.ok) {
+        return {
+          success: true,
+          data: {
+            correlationScore: result.correlationScore,
+            supportEffectiveness: result.supportEffectiveness,
+            healthOutcomeCorrelations: result.healthOutcomeCorrelations,
+            relationshipTrends: result.relationshipTrends,
+            predictiveInsights: result.predictiveInsights,
+            recommendedActions: result.recommendedActions
+          }
+        }
+      } else {
+        throw new Error(result.error || 'Failed to fetch correlation insights')
+      }
+    } catch (error) {
+      console.error('Error fetching correlation insights:', error)
+      return { success: false, error: error.message }
+    }
+  }
 }
 
 // Type Definitions
@@ -455,6 +581,31 @@ export interface SharingPreferences {
   shareTreatmentData: boolean
   emergencyNotifications: boolean
   dailySummaries: boolean
+}
+
+// Enhanced Type Definitions for Sentiment Integration
+export interface SentimentData {
+  userId: string
+  partnerId: string
+  content: string
+  actionType: string
+  category: string
+  relationshipPhase: string
+  partnerHealthStatus?: string
+  sentiment?: number
+  effectiveness?: number
+}
+
+export interface RelationshipInteraction {
+  type: 'communication' | 'emotional_support' | 'practical_help' | 'crisis_response' | 'celebration'
+  description: string
+  category: 'general' | 'symptoms' | 'treatment' | 'emotional' | 'medical_support'
+  effectiveness: number
+  sentimentScore?: number
+  partnerResponse?: 'positive' | 'neutral' | 'negative'
+  partnerHealthContext?: string
+  relationshipPhase?: string
+  notes?: string
 }
 
 // Initialize and export singleton instance

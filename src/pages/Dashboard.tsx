@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { 
   HeartIcon, 
   ExclamationTriangleIcon, 
@@ -10,12 +10,15 @@ import {
   TrophyIcon,
   HandRaisedIcon,
   SparklesIcon,
-  ClockIcon
+  ClockIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline'
 import { useEcosystem } from '../hooks/useEcosystem'
+import CorrelationDashboard from '../components/CorrelationDashboard'
 
 export default function Dashboard() {
   const { isConnected, partnerData, crossAppData, sentimentData } = useEcosystem()
+  const [showCorrelationDashboard, setShowCorrelationDashboard] = useState(false)
 
   const userData = {
     name: 'Mike',
@@ -181,6 +184,28 @@ export default function Dashboard() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex gap-4 mb-6">
+        <button
+          onClick={() => setShowCorrelationDashboard(!showCorrelationDashboard)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+            showCorrelationDashboard 
+              ? 'bg-purple-600 text-white' 
+              : 'bg-white text-purple-600 border border-purple-600 hover:bg-purple-50'
+          }`}
+        >
+          <ChartBarIcon className="w-5 h-5" />
+          {showCorrelationDashboard ? 'Hide' : 'Show'} Correlation Intelligence
+        </button>
+      </div>
+
+      {/* Correlation Dashboard */}
+      {showCorrelationDashboard && (
+        <div className="mb-8">
+          <CorrelationDashboard />
         </div>
       )}
 

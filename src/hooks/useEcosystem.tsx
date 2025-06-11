@@ -1,17 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import { ecosystemAPI, SupportAction, SupportMessage } from '../api/ecosystem-integration'
+import { ecosystemAPI, SupportAction, SupportMessage, RelationshipInteraction } from '../api/ecosystem-integration'
 
 interface EcosystemContextType {
   isConnected: boolean
   partnerData: any
   crossAppData: any
   sentimentData: any
+  correlationInsights: any
   loading: boolean
   error: string | null
   connectToEcosystem: () => Promise<void>
   connectToPartner: (partnerCode: string) => Promise<{ success: boolean; error?: string }>
   logSupportAction: (action: SupportAction) => Promise<{ success: boolean; error?: string }>
   sendSupportMessage: (message: SupportMessage) => Promise<{ success: boolean; error?: string }>
+  trackRelationshipInteraction: (interaction: RelationshipInteraction) => Promise<{ success: boolean; error?: string }>
+  getCorrelationInsights: () => Promise<{ success: boolean; data?: any; error?: string }>
   getSharingPreferences: () => Promise<any>
   updateSharingPreferences: (preferences: any) => Promise<any>
   refreshData: () => Promise<void>
@@ -24,6 +27,7 @@ export function EcosystemProvider({ children }: { children: React.ReactNode }) {
   const [partnerData, setPartnerData] = useState(null)
   const [crossAppData, setCrossAppData] = useState(null)
   const [sentimentData, setSentimentData] = useState(null)
+  const [correlationInsights, setCorrelationInsights] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -244,6 +248,64 @@ export function EcosystemProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Enhanced relationship interaction tracking for SentimentAsAService
+  const trackRelationshipInteraction = async (interaction: RelationshipInteraction) => {
+    try {
+      const userId = getCurrentUserId()
+      const partnerId = partnerData?.id || 'demo-partner-id'
+      
+      const result = await ecosystemAPI.trackRelationshipDynamics(userId, partnerId, interaction)
+      
+      if (result.success) {
+        // Update local sentiment data with latest insights
+        setSentimentData(prev => ({
+          ...prev,
+          relationshipScore: interaction.effectiveness * 2, // Convert to 10-point scale
+          lastInteraction: {
+            type: interaction.type,
+            effectiveness: interaction.effectiveness,
+            sentiment: interaction.sentimentScore,
+            timestamp: new Date().toISOString()
+          },
+          recentInteractions: [
+            ...(prev?.recentInteractions || []).slice(0, 9),
+            {
+              type: interaction.type,
+              description: interaction.description,
+              effectiveness: interaction.effectiveness,
+              timestamp: new Date().toISOString()
+            }
+          ]
+        }))
+        
+        return { success: true }
+      } else {
+        return { success: false, error: result.error }
+      }
+    } catch (err) {
+      return { success: false, error: err.message }
+    }
+  }
+
+  // Get correlation insights from SentimentAsAService
+  const getCorrelationInsights = async () => {
+    try {
+      const userId = getCurrentUserId()
+      const partnerId = partnerData?.id || 'demo-partner-id'
+      
+      const result = await ecosystemAPI.getCrossAppCorrelationInsights(userId, partnerId)
+      
+      if (result.success) {
+        setCorrelationInsights(result.data)
+        return { success: true, data: result.data }
+      } else {
+        return { success: false, error: result.error }
+      }
+    } catch (err) {
+      return { success: false, error: err.message }
+    }
+  }
+
   // Get sharing preferences
   const getSharingPreferences = async () => {
     try {
@@ -276,12 +338,15 @@ export function EcosystemProvider({ children }: { children: React.ReactNode }) {
       partnerData,
       crossAppData,
       sentimentData,
+      correlationInsights,
       loading,
       error,
       connectToEcosystem,
       connectToPartner,
       logSupportAction,
       sendSupportMessage,
+      trackRelationshipInteraction,
+      getCorrelationInsights,
       getSharingPreferences,
       updateSharingPreferences,
       refreshData: connectToEcosystem

@@ -8,10 +8,10 @@ export class EcosystemIntegration {
   constructor() {
     // Initialize Supabase client for ecosystem data
     this.supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-project.supabase.co',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'your-anon-key'
+      import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co',
+      import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key'
     )
-    this.apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000'
+    this.apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
   }
 
   // Partner Connection Management

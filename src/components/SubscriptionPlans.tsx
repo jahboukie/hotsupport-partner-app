@@ -17,50 +17,53 @@ interface SubscriptionPlan {
 
 const plans: SubscriptionPlan[] = [
   {
-    id: 'essential',
-    name: 'Essential Support',
-    price: 12.99,
-    priceId: 'price_essential_monthly',
-    description: 'Core support tools for life transitions',
+    id: 'basic',
+    name: 'Basic',
+    price: 9.99,
+    priceId: 'price_1RYnQqELGHd3NbdJ5eEbaYbw',
+    description: 'Essential partner support tools',
     features: [
-      'Daily check-ins and mood tracking',
-      'Basic AI guidance and insights',
-      'Educational content library',
-      'Progress tracking dashboard',
-      'Community support access'
+      'Daily AI guidance and insights',
+      'Basic educational content library',
+      'Simple progress tracking',
+      'Email support',
+      'Basic communication tips'
     ]
   },
   {
-    id: 'comprehensive',
-    name: 'Comprehensive Care',
-    price: 24.99,
-    priceId: 'price_comprehensive_monthly',
+    id: 'complete',
+    name: 'Complete Partner',
+    price: 19.99,
+    priceId: 'price_1RYnRdELGHd3NbdJ8UAOxdJq',
     description: 'Advanced support with personalized coaching',
     features: [
-      'Personalized AI coaching sessions',
-      'Advanced emotional support tools',
+      'Everything in Basic',
+      'Advanced AI coaching sessions',
       'Crisis intervention resources',
-      'Partner communication guides',
-      'Weekly wellness check-ins',
-      'Custom support plans',
-      'Priority customer support'
+      'Detailed communication guides',
+      'Mood tracking & insights',
+      'Weekly check-ins',
+      'Priority email support',
+      'Custom support plans'
     ],
     popular: true
   },
   {
-    id: 'premium',
-    name: 'Premium Partnership',
-    price: 39.99,
-    priceId: 'price_premium_monthly',
-    description: 'Complete support ecosystem for couples',
+    id: 'couples_therapy_plus',
+    name: 'Couples Therapy Plus',
+    price: 29.99,
+    priceId: 'price_1RYnSTELGHd3NbdJQ9OyjJsZ',
+    description: 'Complete couples support ecosystem',
     features: [
-      'Everything in Comprehensive Care',
-      'Couples therapy resources',
-      'Live expert consultations',
+      'Everything in Complete Partner',
+      'Professional couples therapy resources',
+      'Live expert consultations (monthly)',
       'Advanced relationship analytics',
       'Custom intervention strategies',
       'Family support integration',
-      'Dedicated support specialist'
+      'Dedicated support specialist',
+      'Phone & video support',
+      '24/7 crisis support line'
     ]
   }
 ];

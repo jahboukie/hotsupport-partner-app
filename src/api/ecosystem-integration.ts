@@ -597,7 +597,7 @@ export interface SentimentData {
 }
 
 export interface RelationshipInteraction {
-  type: 'communication' | 'emotional_support' | 'practical_help' | 'crisis_response' | 'celebration'
+  type: 'communication' | 'emotional_support' | 'practical_help' | 'emergency_response' | 'celebration'
   description: string
   category: 'general' | 'symptoms' | 'treatment' | 'emotional' | 'medical_support'
   effectiveness: number

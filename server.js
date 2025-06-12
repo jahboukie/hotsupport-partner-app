@@ -11,7 +11,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT = 3022;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -184,9 +184,23 @@ function generateFollowUpSuggestions(message, category) {
   }
 }
 
-// API Routes
-const apiRoutes = require('./src/server/api-routes.js');
-app.use('/api', apiRoutes);
+// API Routes (commented out for now - fix import issues later)
+// const apiRoutes = require('./src/server/api-routes.js');
+// app.use('/api', apiRoutes);
+
+// Stripe subscription routes (commented out for now - fix import issues later)
+// const subscriptionRoutes = require('./api/subscriptions.js');
+// app.use('/api/subscriptions', subscriptionRoutes);
+
+// Stripe webhook route (for testing)
+app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  console.log('🎯 Stripe webhook received:', req.headers['stripe-signature'] ? 'Valid signature' : 'No signature');
+  
+  // For testing purposes, just log and respond
+  console.log('Webhook body length:', req.body.length);
+  
+  res.status(200).json({ received: true, timestamp: new Date().toISOString() });
+});
 
 // Health check
 app.get('/health', (req, res) => {

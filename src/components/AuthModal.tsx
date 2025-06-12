@@ -4,20 +4,26 @@
  */
 
 import React, { useState } from 'react';
-import { X, Eye, EyeOff, Mail, Lock, User, Heart, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Eye, EyeOff, Mail, Lock, Heart, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultMode?: 'signin' | 'signup';
+  mode?: 'login' | 'signup';
+  onSuccess?: () => void;
 }
 
 type AuthMode = 'signin' | 'signup' | 'reset';
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'signin' }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  mode: propMode = 'signup',
+  onSuccess 
+}) => {
   const { signIn, signUp, resetPassword, loading } = useAuth();
-  const [mode, setMode] = useState<AuthMode>(defaultMode);
+  const [mode, setMode] = useState<AuthMode>(propMode === 'login' ? 'signin' : 'signup');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -102,6 +108,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 's
         if (result.success) {
           onClose();
           clearForm();
+          if (onSuccess) onSuccess();
         } else {
           setErrors({ submit: result.error || 'Sign in failed' });
         }
@@ -117,9 +124,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 's
         if (result.success) {
           setSuccess('Account created successfully! Please check your email to verify your account.');
           setTimeout(() => {
-            setMode('signin');
-            setSuccess('');
-          }, 3000);
+            onClose();
+            clearForm();
+            if (onSuccess) onSuccess();
+          }, 2000);
         } else {
           setErrors({ submit: result.error || 'Sign up failed' });
         }
@@ -236,6 +244,102 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 's
               </div>
               {errors.password && <p className="text-sm text-red-600 mt-1">{errors.password}</p>}
             </div>
+          )}
+
+          {/* Confirm Password Field - Only for signup */}
+          {mode === 'signup' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Confirm your password"
+                />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              </div>
+              {errors.confirmPassword && <p className="text-sm text-red-600 mt-1">{errors.confirmPassword}</p>}
+            </div>
+          )}
+
+          {/* Name Fields - Only for signup */}
+          {mode === 'signup' && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.name ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Your name"
+                  />
+                  {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Partner's Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.partnerName}
+                    onChange={(e) => setFormData({ ...formData, partnerName: e.target.value })}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.partnerName ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Partner's name"
+                  />
+                  {errors.partnerName && <p className="text-sm text-red-600 mt-1">{errors.partnerName}</p>}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Relationship Duration
+                </label>
+                <select
+                  value={formData.relationshipDuration}
+                  onChange={(e) => setFormData({ ...formData, relationshipDuration: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select duration</option>
+                  <option value="Less than 1 year">Less than 1 year</option>
+                  <option value="1-5 years">1-5 years</option>
+                  <option value="5-10 years">5-10 years</option>
+                  <option value="10-20 years">10-20 years</option>
+                  <option value="20+ years">20+ years</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Support Style
+                </label>
+                <select
+                  value={formData.supportStyle}
+                  onChange={(e) => setFormData({ ...formData, supportStyle: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="Active Listener">Active Listener</option>
+                  <option value="Problem Solver">Problem Solver</option>
+                  <option value="Emotional Support">Emotional Support</option>
+                  <option value="Practical Helper">Practical Helper</option>
+                  <option value="Research Oriented">Research Oriented</option>
+                </select>
+              </div>
+            </>
           )}
 
           {/* Submit Button */}

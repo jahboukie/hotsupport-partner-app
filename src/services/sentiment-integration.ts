@@ -80,7 +80,7 @@ export class SentimentIntegrationService {
       correlateWithPartnerHealth: true,
       generatePredictions: true,
       includeInResearch: interaction.category === 'medical_support',
-      flagCrisisPatterns: interaction.type === 'crisis_response'
+      flagCrisisPatterns: interaction.type === 'emergency_response'
     }
 
     // Data points for specific correlation analysis
@@ -89,7 +89,7 @@ export class SentimentIntegrationService {
       supportTiming: this.assessSupportTiming(interaction, partnerHealthContext),
       emotionalResonance: interaction.sentimentScore || 0,
       practicalHelpfulness: interaction.type === 'practical_help' ? interaction.effectiveness : null,
-      crisisResponseTime: interaction.type === 'crisis_response' ? Date.now() : null
+      crisisResponseTime: interaction.type === 'emergency_response' ? Date.now() : null
     }
 
     return { processedText, metadata, correlationFlags, dataPoints }

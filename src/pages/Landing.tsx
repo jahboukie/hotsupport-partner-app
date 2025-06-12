@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AuthModal from '../components/AuthModal'
 
 interface LandingProps {
   onGetStarted: () => void
@@ -7,14 +8,54 @@ interface LandingProps {
 
 export default function Landing({ onGetStarted }: LandingProps) {
   const navigate = useNavigate()
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
 
   const handleGetStarted = () => {
     onGetStarted()
     navigate('/onboarding')
   }
 
+  const handleAuthClick = (mode: 'login' | 'signup') => {
+    setAuthMode(mode)
+    setShowAuthModal(true)
+  }
+
+  const handleSelectPlan = (planName: string) => {
+    setAuthMode('signup')
+    setShowAuthModal(true)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Navigation */}
+      <nav className="relative z-20 bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+              <div className="text-2xl font-bold text-blue-600">🤝 SupportPartner</div>
+            </div>
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="text-gray-700 hover:text-blue-600 transition-colors">Features</a>
+              <a href="#pricing" className="text-gray-700 hover:text-blue-600 transition-colors">Pricing</a>
+              <a href="#testimonials" className="text-gray-700 hover:text-blue-600 transition-colors">Stories</a>
+              <button
+                onClick={() => handleAuthClick('login')}
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => handleAuthClick('signup')}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Get Started Free
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
@@ -49,7 +90,7 @@ export default function Landing({ onGetStarted }: LandingProps) {
                 </div>
 
                 <div className="mt-6 text-sm text-gray-500">
-                  💯 <strong>Free forever</strong> • 🚀 <strong>Results in 5 minutes</strong> • 🏆 <strong>Used by 10,000+ partners</strong>
+                  💯 <strong>7-day free trial</strong> • 🚀 <strong>Results in 5 minutes</strong> • 🏆 <strong>Used by 10,000+ partners</strong>
                 </div>
               </div>
             </main>
@@ -98,7 +139,7 @@ export default function Landing({ onGetStarted }: LandingProps) {
       </div>
 
       {/* Solution Section */}
-      <div className="py-16 bg-gradient-to-r from-blue-50 to-purple-50">
+      <div id="features" className="py-16 bg-gradient-to-r from-blue-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -160,7 +201,7 @@ export default function Landing({ onGetStarted }: LandingProps) {
       </div>
 
       {/* Transformation Stories */}
-      <div className="py-16 bg-white">
+      <div id="testimonials" className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -269,6 +310,179 @@ export default function Landing({ onGetStarted }: LandingProps) {
         </div>
       </div>
 
+      {/* Pricing Section */}
+      <div id="pricing" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              Choose Your Support Level
+            </h2>
+            <p className="mt-4 text-xl text-gray-600">
+              From first steps to relationship mastery – we've got you covered
+            </p>
+          </div>
+
+          <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
+            {/* Basic Support Plan */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="px-8 py-8">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900">Basic Support</h3>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold text-gray-900">$9.99</span>
+                    <span className="text-gray-500">/month</span>
+                  </div>
+                  <p className="mt-4 text-gray-600">Essential tools to start your support journey</p>
+                </div>
+                
+                <div className="mt-8 space-y-4">
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Essential education resources</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Basic communication tools</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Progress tracking access</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Community support forum</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Crisis contact information</span>
+                  </div>
+                </div>
+                
+                <div className="mt-8">
+                  <button
+                    onClick={() => handleSelectPlan('basic')}
+                    className="w-full bg-gray-100 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    Start 7-Day Free Trial
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Complete Partner Plan */}
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-blue-500 relative">
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                  Most Popular
+                </span>
+              </div>
+              <div className="px-8 py-8">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900">Complete Partner</h3>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold text-blue-600">$19.99</span>
+                    <span className="text-gray-500">/month</span>
+                  </div>
+                  <p className="mt-4 text-gray-600">AI-powered guidance for confident support</p>
+                </div>
+                
+                <div className="mt-8 space-y-4">
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Everything in Basic Support</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Personalized AI support plans</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Advanced communication scripts</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Intimacy & relationship guidance</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Crisis intervention protocols</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Partner app integration</span>
+                  </div>
+                </div>
+                
+                <div className="mt-8">
+                  <button
+                    onClick={() => handleSelectPlan('complete')}
+                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Start 7-Day Free Trial
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Couples Therapy Plus Plan */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="px-8 py-8">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900">Couples Therapy Plus</h3>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold text-purple-600">$29.99</span>
+                    <span className="text-gray-500">/month</span>
+                  </div>
+                  <p className="mt-4 text-gray-600">Advanced AI guidance with professional resources</p>
+                </div>
+                
+                <div className="mt-8 space-y-4">
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Everything in Complete Partner</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Advanced AI communication coaching</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Relationship assessment tools</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Family support coordination</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Provider integration & alerts</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-green-500 mr-3">✓</span>
+                    <span>Priority crisis support protocols</span>
+                  </div>
+                </div>
+                
+                <div className="mt-8">
+                  <button
+                    onClick={() => handleSelectPlan('plus')}
+                    className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                  >
+                    Start 7-Day Free Trial
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-gray-600">
+              💝 <strong>30-day money-back guarantee</strong> • 🔒 <strong>Cancel anytime</strong> • ✨ <strong>No hidden fees</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Final CTA */}
       <div className="py-16 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -290,7 +504,7 @@ export default function Landing({ onGetStarted }: LandingProps) {
           
           <div className="mt-6 text-blue-100">
             <p className="text-sm">
-              ✨ <strong>Free forever</strong> • 🔒 <strong>Private & secure</strong> • 💝 <strong>Results guaranteed</strong>
+              ✨ <strong>7-day free trial</strong> • 🔒 <strong>Private & secure</strong> • 💝 <strong>Results guaranteed</strong>
             </p>
             <p className="text-xs mt-2 opacity-75">
               Built with ❤️ through Human-Claude collaboration for the strongest relationships on Earth
@@ -298,6 +512,19 @@ export default function Landing({ onGetStarted }: LandingProps) {
           </div>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          mode={authMode}
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false)
+            navigate('/dashboard')
+          }}
+        />
+      )}
     </div>
   )
 }

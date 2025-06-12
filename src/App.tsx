@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import MobileLayout from './components/MobileLayout'
 import Landing from './pages/Landing'
@@ -25,7 +25,7 @@ function AppContent() {
   const { isAuthenticated, profile, loading } = useAuth();
   const [isFirstVisit, setIsFirstVisit] = useState(false)
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
-  const [installPrompt, setInstallPrompt] = useState(null)
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isOnline, setIsOnline] = useState(navigator.onLine)
   const [showAuthModal, setShowAuthModal] = useState(false)
 
@@ -38,7 +38,7 @@ function AppContent() {
     setHasCompletedOnboarding(!!onboardingCompleted || !!profile?.profile_data?.onboarding_completed)
 
     // Handle PWA install prompt
-    const handleBeforeInstallPrompt = (e) => {
+    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
       e.preventDefault()
       setInstallPrompt(e)
     }

@@ -5,7 +5,7 @@
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -181,8 +181,8 @@ async function handlePaymentIntentFailed(paymentIntent) {
   console.log(`Payment failed: ${failureReason}`);
 }
 
-// Export configuration for Next.js
-export const config = {
+// Export configuration for Vercel
+module.exports.config = {
   api: {
     bodyParser: {
       sizeLimit: '1mb',

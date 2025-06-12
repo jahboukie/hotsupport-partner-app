@@ -1,43 +1,14 @@
 {
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "buildCommand": "npm run build",
-        "outputDirectory": "dist"
-      }
+      "source": "/api/mama-grace/(.*)",
+      "destination": "/api/mama-grace.js"
+    },
+    {
+      "source": "/api/subscriptions/(.*)", 
+      "destination": "/api/subscriptions.js"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/mama-grace/(.*)",
-      "dest": "/api/mama-grace.js"
-    },
-    {
-      "src": "/api/subscriptions/(.*)",
-      "dest": "/api/subscriptions.js"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/src/server/api-routes.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "env": {
-    "VITE_SUPABASE_URL": "@supportpartner_supabase_url",
-    "VITE_SUPABASE_ANON_KEY": "@supportpartner_supabase_anon_key",
-    "VITE_STRIPE_PUBLISHABLE_KEY": "@supportpartner_stripe_publishable_key",
-    "VITE_SENTIMENTASASERVICE_API_KEY": "@sentiment_api_key",
-    "VITE_ANTHROPIC_API_KEY": "@anthropic_api_key",
-    "VITE_AWS_REGION": "@aws_region",
-    "VITE_AWS_ACCESS_KEY_ID": "@aws_access_key_id",
-    "VITE_AWS_SECRET_ACCESS_KEY": "@aws_secret_access_key",
-    "STRIPE_SECRET_KEY": "@stripe_secret_key"
-  },
   "headers": [
     {
       "source": "/api/(.*)",
@@ -47,7 +18,7 @@
           "value": "*"
         },
         {
-          "key": "Access-Control-Allow-Methods",
+          "key": "Access-Control-Allow-Methods", 
           "value": "GET, POST, PUT, DELETE, OPTIONS"
         },
         {

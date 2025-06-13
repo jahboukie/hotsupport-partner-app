@@ -6,28 +6,49 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  console.log('🔍 Webhook endpoint hit');
+  console.log('Headers:', req.headers);
+  console.log('Has body:', !!req.body);
+  console.log('Body type:', typeof req.body);
+
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+  console.log('Has signature:', !!sig);
+  console.log('Has webhook secret:', !!webhookSecret);
+
   if (!webhookSecret) {
-    console.error('Missing STRIPE_WEBHOOK_SECRET');
+    console.error('❌ Missing STRIPE_WEBHOOK_SECRET');
     return res.status(500).json({ error: 'Webhook secret not configured' });
+  }
+
+  if (!sig) {
+    console.error('❌ Missing stripe-signature header');
+    return res.status(400).json({ error: 'Missing stripe-signature header' });
   }
 
   let event;
 
   try {
-    // Get raw body for signature verification
-    const body = req.body;
+    // For Vercel, we need to handle the body differently
+    let body;
+    if (typeof req.body === 'string') {
+      body = req.body;
+    } else {
+      body = JSON.stringify(req.body);
+    }
+    
+    console.log('Body length:', body.length);
     
     // Verify webhook signature
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+    console.log('✅ Webhook signature verified');
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
+    console.error('❌ Webhook signature verification failed:', err.message);
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
-  console.log('✅ Webhook verified:', event.type);
+  console.log('✅ Processing event:', event.type, event.id);
 
   // Handle the event
   try {
@@ -89,8 +110,10 @@ export default async function handler(req, res) {
         break;
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        console.log(`❓ Unhandled event type: ${event.type}`);
     }
+
+    console.log('✅ Event processed successfully');
 
     // Return success
     res.status(200).json({ 
@@ -100,7 +123,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Error processing webhook:', error);
+    console.error('❌ Error processing webhook:', error);
     res.status(500).json({ 
       error: 'Webhook processing failed',
       details: error.message 
@@ -108,11 +131,9 @@ export default async function handler(req, res) {
   }
 }
 
-// Important: This tells Vercel to pass raw body for signature verification
+// Disable body parsing so we can verify the raw body signature
 export const config = {
   api: {
-    bodyParser: {
-      sizeLimit: '1mb',
-    },
+    bodyParser: false,
   },
 }

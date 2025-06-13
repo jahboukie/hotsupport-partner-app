@@ -1,5 +1,14 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+// Helper function to get raw body from request
+async function getRawBody(req) {
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -7,15 +16,13 @@ export default async function handler(req, res) {
   }
 
   console.log('🔍 Webhook endpoint hit');
-  console.log('Headers:', req.headers);
-  console.log('Has body:', !!req.body);
-  console.log('Body type:', typeof req.body);
-
+  
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   console.log('Has signature:', !!sig);
   console.log('Has webhook secret:', !!webhookSecret);
+  console.log('Webhook secret preview:', webhookSecret ? webhookSecret.substring(0, 10) + '...' : 'none');
 
   if (!webhookSecret) {
     console.error('❌ Missing STRIPE_WEBHOOK_SECRET');
@@ -30,14 +37,8 @@ export default async function handler(req, res) {
   let event;
 
   try {
-    // For Vercel, we need to handle the body differently
-    let body;
-    if (typeof req.body === 'string') {
-      body = req.body;
-    } else {
-      body = JSON.stringify(req.body);
-    }
-    
+    // Get the raw body for signature verification
+    const body = await getRawBody(req);
     console.log('Body length:', body.length);
     
     // Verify webhook signature
@@ -119,7 +120,8 @@ export default async function handler(req, res) {
     res.status(200).json({ 
       received: true, 
       type: event.type,
-      id: event.id 
+      id: event.id,
+      timestamp: new Date().toISOString()
     });
 
   } catch (error) {
@@ -131,7 +133,7 @@ export default async function handler(req, res) {
   }
 }
 
-// Disable body parsing so we can verify the raw body signature
+// Critical: Disable body parsing for raw body access
 export const config = {
   api: {
     bodyParser: false,
